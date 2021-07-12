@@ -8,11 +8,12 @@
 import RIBs
 
 
-protocol RootInteractable: Interactable, LoggedOutListener, LoggedInListener {
+protocol RootInteractable: Interactable, LoggedOutListener, LoggedInListener { //LoggedOutListener, LoggedInLitener : 하위노트에 대한 통신위해 Listener 상속
     var router: RootRouting? { get set }
     var listener: RootListener? { get set }
 }
 
+//RootViewController에 구현해야 하는 부분 정의
 protocol RootViewControllable: ViewControllable {
     // TODO: Declare methods the router invokes to manipulate the view hierarchy.
     func present(viewController: ViewControllable)
@@ -20,7 +21,9 @@ protocol RootViewControllable: ViewControllable {
 }
 
 final class RootRouter: LaunchRouter<RootInteractable, RootViewControllable>, RootRouting {
-
+    
+    
+    
     init(interactor: RootInteractable,
          viewController: RootViewControllable,
          loggedOutBuilder: LoggedOutBuildable,
@@ -34,33 +37,33 @@ final class RootRouter: LaunchRouter<RootInteractable, RootViewControllable>, Ro
     override func didLoad() {
         super.didLoad()
         
-        routeToLoggedOut()
     }
+    
+    
     
     private let loggedOutBuilder: LoggedOutBuildable
     private let loggedInBuilder: LoggedInBuildable
     
     private var loggedOut: ViewableRouting?
     
-   
-    func routeToLoggedIn(withPlayer1Name player1Name: String, player2Name: String) {
+    
+    func routeToLoggedIn(email: String, pwd: String) {
         // Detach logged out.
         if let loggedOut = self.loggedOut {
             detachChild(loggedOut)
             viewController.dismiss(viewController: loggedOut.viewControllable)
             self.loggedOut = nil
         }
-
+        
         let loggedIn = loggedInBuilder.build(withListener: interactor)
         attachChild(loggedIn)
-        
     }
-
+    
     
     private func routeToLoggedOut() {
         let loggedOut = loggedOutBuilder.build(withListener: interactor)
         self.loggedOut = loggedOut
         attachChild(loggedOut)
-              viewController.present(viewController: loggedOut.viewControllable)
+//        viewController.present(viewController: loggedOut.viewControllable)
     }
 }
